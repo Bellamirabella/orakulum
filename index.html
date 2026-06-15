@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#fff9f7">
+    <meta name="description" content="Orakulum - Deine Zahlen. Deine Botschaft.">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css?v=3">
+    <title>Orakulum</title>
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <main class="app-shell">
+      <header class="brand">
+        <button class="brand-mark" id="homeButton" aria-label="Zur Startseite">
+          <span class="moon" aria-hidden="true">
+            <span class="moon-glow"></span>
+            <span class="crater crater-one"></span>
+            <span class="crater crater-two"></span>
+            <span class="crater crater-three"></span>
+          </span>
+        </button>
+        <p class="eyebrow">Willkommen bei</p>
+        <h1>Orakulum</h1>
+        <p class="tagline">Deine Zahlen. Deine Botschaft.</p>
+      </header>
+
+      <section class="screen active" id="homeScreen">
+        <div class="intro">
+          <h2>Wähle deinen Themenbereich</h2>
+          <p>Welches Thema bewegt dich gerade?</p>
+        </div>
+
+        <div class="topic-grid" id="topicGrid">
+          <button class="topic-card available" data-topic="angels">
+            <span class="topic-symbol">☾</span>
+            <span>Die Engel sprechen</span>
+            <small>Bereit</small>
+          </button>
+          <button class="topic-card" disabled>
+            <span class="topic-symbol">♡</span><span>Liebe</span><small>Demnächst</small>
+          </button>
+          <button class="topic-card" disabled>
+            <span class="topic-symbol">◇</span><span>Beruf</span><small>Demnächst</small>
+          </button>
+          <button class="topic-card" disabled>
+            <span class="topic-symbol">◉</span><span>Finanzen</span><small>Demnächst</small>
+          </button>
+          <button class="topic-card" disabled>
+            <span class="topic-symbol">⌁</span><span>Psychologie</span><small>Demnächst</small>
+          </button>
+          <button class="topic-card" disabled>
+            <span class="topic-symbol">✦</span><span>Gesundheit</span><small>Demnächst</small>
+          </button>
+          <button class="topic-card" disabled>
+            <span class="topic-symbol">◎</span><span>Geografie</span><small>Demnächst</small>
+          </button>
+        </div>
+      </section>
+
+      <section class="screen" id="questionScreen">
+        <button class="back-button" data-back aria-label="Zurück">← Zurück</button>
+        <div class="panel">
+          <p class="section-label">Die Engel sprechen</p>
+          <h2>Denke jetzt an deine Frage.</h2>
+          <p>Gib anschließend intuitiv bis zu 20 Zahlen zwischen 1 und 1000 ein.</p>
+
+          <form id="numberForm" novalidate>
+            <label for="numberInput">Deine Zahlen</label>
+            <textarea
+              id="numberInput"
+              rows="3"
+              inputmode="numeric"
+              autocomplete="off"
+              placeholder="Zum Beispiel: 12, 480, 12, 999"
+              aria-describedby="inputHint inputError"
+            ></textarea>
+            <div class="field-meta">
+              <span id="inputHint">Mit Kommas oder Leerzeichen trennen</span>
+              <span id="numberCount">0 / 20</span>
+            </div>
+            <p class="error-message" id="inputError" role="alert"></p>
+            <button class="primary-button" type="submit">Botschaft empfangen</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="screen" id="loadingScreen" aria-live="polite">
+        <div class="loading-content">
+          <div class="moon moon-large moon-animated" aria-hidden="true">
+            <span class="moon-glow"></span>
+            <span class="crater crater-one"></span>
+            <span class="crater crater-two"></span>
+            <span class="crater crater-three"></span>
+          </div>
+          <p>Deine Botschaft wird empfangen …</p>
+        </div>
+      </section>
+
+      <section class="screen" id="resultScreen">
+        <div class="message-card">
+          <div class="message-ornament" aria-hidden="true">✦</div>
+          <p id="resultMessage"></p>
+          <div class="result-actions">
+            <button class="primary-button" id="newQuestionButton">Neue Frage</button>
+            <button class="secondary-button" id="shareButton">Botschaft teilen</button>
+          </div>
+          <p class="share-status" id="shareStatus" aria-live="polite"></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="disclaimer">
+      <strong>Wichtiger Hinweis</strong>
+      <span>Orakulum dient ausschließlich der Unterhaltung. Die Botschaften sind keine Tatsachenvorhersagen und ersetzen keine medizinische, psychologische, rechtliche oder finanzielle Beratung. Entscheidungen triffst du eigenverantwortlich.</span>
+    </footer>
+
+    <script src="app.js?v=3" defer></script>
+  </body>
+</html>
