@@ -12,9 +12,21 @@ const inputError = document.querySelector("#inputError");
 const resultMessage = document.querySelector("#resultMessage");
 const shareStatus = document.querySelector("#shareStatus");
 
-let cards = [];
+const decks = {};
 let currentDeck = [];
 let currentMessage = "";
+let currentTopic = "";
+
+const topicSettings = {
+  angels: {
+    label: "Die Engel sprechen",
+    file: "engel-karten-1000.json",
+  },
+  love: {
+    label: "Liebe",
+    file: "liebe-karten-1000.json",
+  },
+};
 
 function showScreen(name) {
   Object.entries(screens).forEach(([screenName, element]) => {
@@ -98,7 +110,7 @@ function joinNames(names) {
 
 function buildInterpretation(selectedCards) {
   const ranked = selectedCards.slice(0, 3);
-  const names = joinNames(ranked.map((card) => card.angel));
+  const names = joinNames(ranked.map((card) => card.angel || card.title));
   const repeated = ranked.find((card) => card.repetitions > 1);
   const totalScore = selectedCards.reduce(
     (sum, card) => sum + card.toneScore * card.repetitions,
@@ -127,7 +139,7 @@ function buildInterpretation(selectedCards) {
     .map((card) => card.core.replace(/[.!?]$/, ""))
     .join("; zugleich gilt: ");
   const emphasis = repeated
-    ? ` Die wiederkehrende Kraft von ${repeated.angel} verstärkt dabei den Schwerpunkt „${repeated.focus}“.`
+    ? ` Die wiederkehrende Kraft von ${repeated.angel || repeated.title} verstärkt dabei den Schwerpunkt „${repeated.focus}“.`
     : "";
   const guidance = ranked[0].guidance;
 
@@ -136,20 +148,29 @@ function buildInterpretation(selectedCards) {
 
 async function loadCards() {
   try {
-    const response = await fetch("engel-karten-1000.json");
-    if (!response.ok) throw new Error("Kartendaten nicht verfügbar");
-    const data = await response.json();
-    cards = data.cards;
-    currentDeck = shuffle(cards);
+    await Promise.all(
+      Object.entries(topicSettings).map(async ([topic, settings]) => {
+        const response = await fetch(settings.file);
+        if (!response.ok) throw new Error("Kartendaten nicht verfügbar");
+        const data = await response.json();
+        decks[topic] = data.cards;
+      }),
+    );
   } catch {
     inputError.textContent = "Die Kartendaten konnten nicht geladen werden. Bitte öffne Orakulum über einen Webserver.";
   }
 }
 
-document.querySelector('[data-topic="angels"]').addEventListener("click", () => {
-  currentDeck = shuffle(cards);
-  showScreen("question");
-  setTimeout(() => numberInput.focus(), 300);
+document.querySelectorAll("[data-topic]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const topic = button.dataset.topic;
+    if (!decks[topic]) return;
+    currentTopic = topic;
+    currentDeck = shuffle(decks[topic]);
+    document.querySelector("#activeTopicLabel").textContent = topicSettings[topic].label;
+    showScreen("question");
+    setTimeout(() => numberInput.focus(), 300);
+  });
 });
 
 document.querySelectorAll("[data-back]").forEach((button) => {
@@ -182,7 +203,7 @@ numberForm.addEventListener("submit", (event) => {
 });
 
 document.querySelector("#newQuestionButton").addEventListener("click", () => {
-  currentDeck = shuffle(cards);
+  currentDeck = shuffle(decks[currentTopic]);
   currentMessage = "";
   resultMessage.textContent = "";
   shareStatus.textContent = "";
