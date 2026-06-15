@@ -269,6 +269,21 @@ h2 {
   margin-top: 0;
 }
 
+.topic-notice {
+  display: none;
+  margin-top: 1rem !important;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(168, 95, 104, 0.3);
+  border-radius: 0.85rem;
+  color: var(--wine) !important;
+  background: var(--rose-50);
+  font-size: 0.86rem;
+}
+
+.topic-notice.visible {
+  display: block;
+}
+
 form {
   margin-top: 2rem;
 }

@@ -26,6 +26,19 @@ const topicSettings = {
     label: "Liebe",
     file: "liebe-karten-1000.json",
   },
+  career: {
+    label: "Beruf",
+    file: "beruf-karten-1000.json",
+  },
+  health: {
+    label: "Gesundheit",
+    file: "gesundheit-karten-1000.json",
+    notice: "Die Gesundheitskarten sind rein symbolische Unterhaltungsimpulse und keine Diagnose. Bei Beschwerden oder Sorgen wende dich bitte an medizinisches Fachpersonal.",
+  },
+  geography: {
+    label: "Geografie",
+    file: "geografie-karten-1000.json",
+  },
 };
 
 function showScreen(name) {
@@ -101,28 +114,23 @@ function pickCards(numbers) {
     });
 }
 
-function joinNames(names) {
-  const uniqueNames = [...new Set(names)];
-  if (uniqueNames.length === 1) return uniqueNames[0];
-  if (uniqueNames.length === 2) return `${uniqueNames[0]} und ${uniqueNames[1]}`;
-  return `${uniqueNames.slice(0, -1).join(", ")} und ${uniqueNames.at(-1)}`;
+function asSentence(text) {
+  const clean = text.trim();
+  if (!clean) return "";
+  return /[.!?]$/.test(clean) ? clean : `${clean}.`;
 }
 
 function buildInterpretation(selectedCards) {
   const ranked = selectedCards.slice(0, 3);
-  const names = joinNames(ranked.map((card) => card.angel || card.title));
   const repeated = ranked.find((card) => card.repetitions > 1);
-
-  const coreCards = ranked.slice(0, 2);
-  const core = coreCards
-    .map((card) => card.core.replace(/[.!?]$/, ""))
-    .join(". ");
+  const messages = ranked.map((card) =>
+    asSentence(card.displayText || card.core || card.interpretation || card.title),
+  );
   const emphasis = repeated
-    ? ` ${repeated.angel || repeated.title} erscheint mehrfach und verstärkt: ${repeated.core}`
+    ? `Dieser Impuls erscheint ${repeated.repetitions}-mal und wird dadurch verstärkt.`
     : "";
-  const guidance = ranked[0].guidance;
 
-  return `${names}: ${core}.${emphasis} ${guidance}`;
+  return `${messages.join(" ")} ${emphasis}`.trim();
 }
 
 async function loadCards() {
@@ -147,6 +155,9 @@ document.querySelectorAll("[data-topic]").forEach((button) => {
     currentTopic = topic;
     currentDeck = shuffle(decks[topic]);
     document.querySelector("#activeTopicLabel").textContent = topicSettings[topic].label;
+    const topicNotice = document.querySelector("#topicNotice");
+    topicNotice.textContent = topicSettings[topic].notice || "";
+    topicNotice.classList.toggle("visible", Boolean(topicSettings[topic].notice));
     showScreen("question");
     setTimeout(() => numberInput.focus(), 300);
   });
