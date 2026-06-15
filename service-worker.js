@@ -1,9 +1,9 @@
-const CACHE_NAME = "orakulum-v20";
+const CACHE_NAME = "orakulum-v21";
 const APP_FILES = [
   "./",
   "index.html",
-  "styles.css?v=19",
-  "app.js?v=20",
+  "styles.css?v=21",
+  "app.js?v=21",
   "manifest.webmanifest",
   "icon.svg",
   "engel-karten-1000.json",

@@ -150,71 +150,15 @@ function joinItems(items) {
 }
 
 function renderCareerCards(cards) {
-  const groups = cards.reduce((result, card) => {
-    (result[card.cardType] ||= []).push(card);
-    return result;
-  }, {});
-  const messages = [];
-  const texts = (type) => (groups[type] || []).map((card) => withoutFullStop(card.displayText));
-
-  if (groups.situation) {
-    messages.push(`Als berufliche Entwicklung zeigt sich: ${joinItems(texts("situation"))}.`);
-  }
-  if (groups.field) {
-    messages.push(`Das Arbeitsfeld weist in Richtung ${joinItems(texts("field"))}.`);
-  }
-
-  const tasks = [...texts("work"), ...texts("activity")];
-  if (tasks.length) {
-    messages.push(`Beruflich stehen diese Aufgaben im Mittelpunkt: ${joinItems(tasks)}.`);
-  }
-  if (groups.money) {
-    messages.push(`Finanziell zeigen sich: ${joinItems(texts("money"))}.`);
-  }
-  if (groups.time) {
-    messages.push(`Zeitlich zeigt sich: ${joinItems(texts("time"))}.`);
-  }
-  if (groups.symbol) {
-    messages.push(`Als weitere Einflüsse zeigen sich: ${joinItems(texts("symbol"))}.`);
-  }
-
-  return messages;
+  return cards.map((card) => asSentence(card.displayText));
 }
 
-function renderLoveCard(card, index) {
-  const text = withoutFullStop(card.displayText);
-  if (card.cardType === "angel") {
-    return `${text} begleitet diese Liebesbotschaft.`;
-  }
-  if (card.cardType === "time") {
-    return `Zeitlich zeigt sich: ${text}.`;
-  }
-  if (index === 0) return `Im Mittelpunkt steht: ${text}.`;
-  if (index === 1) return `Gleichzeitig zeigt sich: ${text}.`;
-  if (index === 2) return `Hinzu kommt: ${text}.`;
-  return `Als weiterer Hinweis erscheint: ${text}.`;
+function renderLoveCard(card) {
+  return asSentence(card.displayText);
 }
 
 function renderFinanceCards(cards) {
-  const groups = cards.reduce((result, card) => {
-    (result[card.cardType] ||= []).push(withoutFullStop(card.displayText));
-    return result;
-  }, {});
-  const messages = [];
-
-  if (groups.positive) {
-    messages.push(`Als positive finanzielle Tendenzen zeigen sich: ${joinItems(groups.positive)}.`);
-  }
-  if (groups.finance) {
-    messages.push(`Im Mittelpunkt stehen: ${joinItems(groups.finance)}.`);
-  }
-  if (groups.warning) {
-    messages.push(`Als finanzielle Warnhinweise erscheinen: ${joinItems(groups.warning)}.`);
-  }
-  if (groups.time) {
-    messages.push(`Zeitlich zeigt sich: ${joinItems(groups.time)}.`);
-  }
-  return messages;
+  return cards.map((card) => asSentence(card.displayText));
 }
 
 function renderPsychologyCards(cards) {
@@ -237,13 +181,11 @@ function buildInterpretation(selectedCards) {
       })
       .map(renderLoveCard);
   } else if (currentTopic === "health") {
-    messages = ranked.map((card) => {
-      const text = withoutFullStop(card.displayText.replace(/^Symbolischer Gesundheitsimpuls:\s*/i, ""));
-      return `Als symbolischer Impuls zeigt sich ${text}.`;
-    });
+    messages = ranked.map((card) =>
+      asSentence(card.displayText.replace(/^Symbolischer Gesundheitsimpuls:\s*/i, "")),
+    );
   } else if (currentTopic === "geography") {
-    const places = ranked.map((card) => withoutFullStop(card.displayText));
-    messages = [`Die geografischen Hinweise führen zu: ${places.join(", ")}.`];
+    messages = ranked.map((card) => asSentence(card.displayText));
   } else if (currentTopic === "finance") {
     messages = renderFinanceCards(ranked);
   } else if (currentTopic === "psychology") {
