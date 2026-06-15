@@ -431,6 +431,20 @@ form .primary-button {
   line-height: 1.7;
 }
 
+.result-note {
+  display: none;
+  max-width: 38rem;
+  margin: 1.35rem auto 0;
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.result-note.visible {
+  display: block;
+}
+
 .result-actions {
   display: flex;
   justify-content: center;

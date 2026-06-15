@@ -10,6 +10,7 @@ const numberInput = document.querySelector("#numberInput");
 const numberCount = document.querySelector("#numberCount");
 const inputError = document.querySelector("#inputError");
 const resultMessage = document.querySelector("#resultMessage");
+const resultNote = document.querySelector("#resultNote");
 const shareStatus = document.querySelector("#shareStatus");
 
 const decks = {};
@@ -218,13 +219,7 @@ function renderFinanceCards(cards) {
 
 function renderPsychologyCards(cards) {
   const terms = cards.map((card) => withoutFullStop(card.displayText));
-  if (terms.length === 1) {
-    return [`Als symbolisches psychologisches Thema zeigt sich: ${terms[0]}.`];
-  }
-  return [
-    `Als symbolische psychologische Themen zeigen sich: ${joinItems(terms)}.`,
-    "Diese Begriffe beschreiben keine Diagnose, sondern dienen nur als Impulse zur persönlichen Betrachtung.",
-  ];
+  return [`${joinItems(terms)}.`];
 }
 
 function buildInterpretation(selectedCards) {
@@ -320,11 +315,16 @@ numberForm.addEventListener("submit", (event) => {
   }
 
   currentMessage = buildInterpretation(pickCards(validation.numbers));
+  const psychologyNote = currentTopic === "psychology"
+    ? "Diese Begriffe beschreiben keine Diagnose, sondern dienen nur als Impulse zur persönlichen Betrachtung."
+    : "";
   numberInput.value = "";
   updateNumberCount();
   showScreen("loading");
   window.setTimeout(() => {
     resultMessage.textContent = currentMessage;
+    resultNote.textContent = psychologyNote;
+    resultNote.classList.toggle("visible", Boolean(psychologyNote));
     showScreen("result");
   }, 4000);
 });
@@ -333,6 +333,8 @@ document.querySelector("#newQuestionButton").addEventListener("click", () => {
   currentDeck = shuffle(decks[currentTopic]);
   currentMessage = "";
   resultMessage.textContent = "";
+  resultNote.textContent = "";
+  resultNote.classList.remove("visible");
   shareStatus.textContent = "";
   showScreen("question");
   setTimeout(() => numberInput.focus(), 300);
