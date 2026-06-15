@@ -386,59 +386,28 @@ form .primary-button {
   letter-spacing: 0.05em;
 }
 
-.number-orbit {
+.star-field {
   position: relative;
-  width: 6rem;
-  height: 6rem;
+  width: 7rem;
+  height: 5.5rem;
   border-radius: 50%;
-  background: radial-gradient(circle, #fff 0 17%, #f8e1e2 44%, #d8aa78 73%, #b78a3d 100%);
-  box-shadow: 0 0 2.8rem rgba(211, 150, 156, 0.48);
-  animation: number-breathe 2s ease-in-out infinite;
+  background: radial-gradient(circle, rgba(248, 225, 226, 0.65), transparent 67%);
 }
 
-.orbit-ring {
+.loading-star {
   position: absolute;
-  inset: -0.65rem;
-  border: 1px solid rgba(183, 138, 61, 0.48);
-  border-radius: 50%;
-  animation: orbit-spin 4s linear infinite;
+  color: var(--gold);
+  opacity: 0;
+  filter: drop-shadow(0 0 0.55rem rgba(211, 150, 156, 0.72));
+  animation: star-appear 2.4s ease-in-out infinite;
 }
 
-.orbit-ring::after {
-  content: "";
-  position: absolute;
-  width: 0.55rem;
-  height: 0.55rem;
-  top: 0.25rem;
-  left: 0.55rem;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 0.8rem rgba(183, 138, 61, 0.8);
-}
-
-.orbit-number,
-.orbit-star {
-  position: absolute;
-  color: var(--wine);
-  font-family: Georgia, "Times New Roman", serif;
-}
-
-.orbit-number {
-  font-size: 1rem;
-}
-
-.number-one { top: 0.75rem; left: 1.35rem; }
-.number-seven { top: 1.2rem; right: 1.15rem; }
-.number-nine { bottom: 0.8rem; left: 2.55rem; }
-
-.orbit-star {
-  top: 50%;
-  left: 50%;
-  color: #fff;
-  font-size: 1.25rem;
-  transform: translate(-50%, -50%);
-  text-shadow: 0 0 0.65rem rgba(93, 48, 59, 0.42);
-}
+.star-one { top: 1.9rem; left: 2.85rem; color: #fff; font-size: 1.5rem; animation-delay: 0s; }
+.star-two { top: 0.35rem; left: 1rem; color: #d7a6aa; font-size: 1.05rem; animation-delay: 0.35s; }
+.star-three { top: 0.65rem; right: 0.75rem; font-size: 1.25rem; animation-delay: 0.7s; }
+.star-four { bottom: 0.35rem; left: 0.55rem; color: #efd8d9; font-size: 1.15rem; animation-delay: 1.05s; }
+.star-five { right: 1.25rem; bottom: 0.25rem; font-size: 1rem; animation-delay: 1.4s; }
+.star-six { top: 2.25rem; right: 2.1rem; color: #fff; font-size: 0.85rem; animation-delay: 1.75s; }
 
 .message-card {
   position: relative;
@@ -525,19 +494,9 @@ form .primary-button {
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes number-breathe {
-  0%, 100% {
-    box-shadow: 0 0 2rem rgba(211, 150, 156, 0.38);
-    transform: scale(0.97);
-  }
-  50% {
-    box-shadow: 0 0 3.8rem rgba(199, 154, 71, 0.56);
-    transform: scale(1.03);
-  }
-}
-
-@keyframes orbit-spin {
-  to { transform: rotate(360deg); }
+@keyframes star-appear {
+  0%, 100% { opacity: 0; transform: scale(0.45) rotate(-12deg); }
+  40%, 65% { opacity: 1; transform: scale(1) rotate(0); }
 }
 
 @media (min-width: 44rem) {
