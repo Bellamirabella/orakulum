@@ -1,7 +1,7 @@
 {
   "name": "Orakulum",
   "short_name": "Orakulum",
-  "description": "Deine Zahlen. Deine Botschaft.",
+  "description": "Die Magie der Zahlen",
   "lang": "de",
   "start_url": "./",
   "display": "standalone",

@@ -269,6 +269,10 @@ h2 {
   margin-top: 0;
 }
 
+.question-heading {
+  font-size: clamp(1.35rem, 3.5vw, 1.75rem);
+}
+
 .topic-notice {
   display: none;
   margin-top: 1rem !important;
@@ -383,8 +387,13 @@ form .primary-button {
 }
 
 .moon-large {
-  width: 9rem;
-  height: 9rem;
+  width: 6.25rem;
+  height: 6.25rem;
+  background:
+    radial-gradient(circle at 31% 25%, #ffffff 0 9%, transparent 10%),
+    radial-gradient(circle at 68% 66%, rgba(151, 89, 98, 0.14) 0 10%, transparent 11%),
+    linear-gradient(145deg, #fffefd 4%, #f6d9dc 46%, #dfb6a0 72%, #c79a47 100%);
+  border-color: rgba(183, 138, 61, 0.68);
 }
 
 .moon-animated {

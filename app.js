@@ -39,7 +39,21 @@ const topicSettings = {
     label: "Geografie",
     file: "geografie-karten-1000.json",
   },
+  finance: {
+    label: "Finanzen",
+    file: "finanzen-karten-1000.json",
+    notice: "Die Finanzkarten dienen ausschließlich der Unterhaltung und sind keine Finanz-, Anlage-, Steuer- oder Rechtsberatung.",
+  },
+  psychology: {
+    label: "Psychologie",
+    file: "psychologie-karten-1000.json",
+    heading: "Welches psychologische Thema liegt in meinem Energiefeld?",
+    notice: "Die psychologischen Fachbegriffe sind ausschließlich symbolische Unterhaltungsimpulse. Sie sind keine Diagnose und ersetzen keine psychologische, psychotherapeutische oder medizinische Beratung.",
+  },
 };
+
+const defaultQuestionHeading = "Nimm dir einen Moment Ruhe.";
+const defaultQuestionInstruction = "Gib intuitiv bis zu 20 beliebige Zahlen zwischen 1 und 1000 ein.";
 
 function showScreen(name) {
   Object.entries(screens).forEach(([screenName, element]) => {
@@ -120,14 +134,133 @@ function asSentence(text) {
   return /[.!?]$/.test(clean) ? clean : `${clean}.`;
 }
 
+function lowerFirst(text) {
+  return text.charAt(0).toLowerCase() + text.slice(1);
+}
+
+function withoutFullStop(text) {
+  return text.trim().replace(/[.!?]+$/, "");
+}
+
+function joinItems(items) {
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return `${items[0]} und ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")} und ${items.at(-1)}`;
+}
+
+function renderCareerCards(cards) {
+  const groups = cards.reduce((result, card) => {
+    (result[card.cardType] ||= []).push(card);
+    return result;
+  }, {});
+  const messages = [];
+  const texts = (type) => (groups[type] || []).map((card) => withoutFullStop(card.displayText));
+
+  if (groups.situation) {
+    messages.push(`Als berufliche Entwicklung zeigt sich: ${joinItems(texts("situation"))}.`);
+  }
+  if (groups.field) {
+    messages.push(`Das Arbeitsfeld weist in Richtung ${joinItems(texts("field"))}.`);
+  }
+
+  const tasks = [...texts("work"), ...texts("activity")];
+  if (tasks.length) {
+    messages.push(`Beruflich stehen diese Aufgaben im Mittelpunkt: ${joinItems(tasks)}.`);
+  }
+  if (groups.money) {
+    messages.push(`Finanziell zeigen sich: ${joinItems(texts("money"))}.`);
+  }
+  if (groups.time) {
+    messages.push(`Zeitlich zeigt sich: ${joinItems(texts("time"))}.`);
+  }
+  if (groups.symbol) {
+    messages.push(`Als weitere Einflüsse zeigen sich: ${joinItems(texts("symbol"))}.`);
+  }
+
+  return messages;
+}
+
+function renderLoveCard(card, index) {
+  const text = withoutFullStop(card.displayText);
+  if (card.cardType === "angel") {
+    return `${text} begleitet diese Liebesbotschaft.`;
+  }
+  if (card.cardType === "time") {
+    return `Zeitlich zeigt sich: ${text}.`;
+  }
+  if (index === 0) return `Im Mittelpunkt steht: ${text}.`;
+  if (index === 1) return `Gleichzeitig zeigt sich: ${text}.`;
+  if (index === 2) return `Hinzu kommt: ${text}.`;
+  return `Als weiterer Hinweis erscheint: ${text}.`;
+}
+
+function renderFinanceCards(cards) {
+  const groups = cards.reduce((result, card) => {
+    (result[card.cardType] ||= []).push(withoutFullStop(card.displayText));
+    return result;
+  }, {});
+  const messages = [];
+
+  if (groups.positive) {
+    messages.push(`Als positive finanzielle Tendenzen zeigen sich: ${joinItems(groups.positive)}.`);
+  }
+  if (groups.finance) {
+    messages.push(`Im Mittelpunkt stehen: ${joinItems(groups.finance)}.`);
+  }
+  if (groups.warning) {
+    messages.push(`Als finanzielle Warnhinweise erscheinen: ${joinItems(groups.warning)}.`);
+  }
+  if (groups.time) {
+    messages.push(`Zeitlich zeigt sich: ${joinItems(groups.time)}.`);
+  }
+  return messages;
+}
+
+function renderPsychologyCards(cards) {
+  const terms = cards.map((card) => withoutFullStop(card.displayText));
+  if (terms.length === 1) {
+    return [`Als symbolisches psychologisches Thema zeigt sich: ${terms[0]}.`];
+  }
+  return [
+    `Als symbolische psychologische Themen zeigen sich: ${joinItems(terms)}.`,
+    "Diese Begriffe beschreiben keine Diagnose, sondern dienen nur als Impulse zur persönlichen Betrachtung.",
+  ];
+}
+
 function buildInterpretation(selectedCards) {
-  const ranked = selectedCards.slice(0, 3);
+  const ranked = selectedCards.slice(0, 4);
   const repeated = ranked.find((card) => card.repetitions > 1);
-  const messages = ranked.map((card) =>
-    asSentence(card.displayText || card.core || card.interpretation || card.title),
-  );
+  let messages;
+
+  if (currentTopic === "career") {
+    messages = renderCareerCards(ranked);
+  } else if (currentTopic === "love") {
+    messages = ranked
+      .sort((first, second) => {
+        const order = { angel: 0, message: 1, time: 2 };
+        return (order[first.cardType] ?? 9) - (order[second.cardType] ?? 9);
+      })
+      .map(renderLoveCard);
+  } else if (currentTopic === "health") {
+    messages = ranked.map((card) => {
+      const text = withoutFullStop(card.displayText.replace(/^Symbolischer Gesundheitsimpuls:\s*/i, ""));
+      return `Als symbolischer Impuls zeigt sich ${text}.`;
+    });
+  } else if (currentTopic === "geography") {
+    const places = ranked.map((card) => withoutFullStop(card.displayText));
+    messages = [`Die geografischen Hinweise führen zu: ${places.join(", ")}.`];
+  } else if (currentTopic === "finance") {
+    messages = renderFinanceCards(ranked);
+  } else if (currentTopic === "psychology") {
+    messages = renderPsychologyCards(ranked);
+  } else {
+    messages = ranked.map((card) =>
+      asSentence(card.displayText || card.core || card.interpretation || card.title),
+    );
+  }
+
   const emphasis = repeated
-    ? `Dieser Impuls erscheint ${repeated.repetitions}-mal und wird dadurch verstärkt.`
+    ? `Der Impuls „${withoutFullStop(repeated.displayText)}“ erscheint ${repeated.repetitions}-mal und wird dadurch verstärkt.`
     : "";
 
   return `${messages.join(" ")} ${emphasis}`.trim();
@@ -155,6 +288,10 @@ document.querySelectorAll("[data-topic]").forEach((button) => {
     currentTopic = topic;
     currentDeck = shuffle(decks[topic]);
     document.querySelector("#activeTopicLabel").textContent = topicSettings[topic].label;
+    document.querySelector("#questionHeading").textContent =
+      topicSettings[topic].heading || defaultQuestionHeading;
+    document.querySelector("#questionInstruction").textContent =
+      topicSettings[topic].instruction || defaultQuestionInstruction;
     const topicNotice = document.querySelector("#topicNotice");
     topicNotice.textContent = topicSettings[topic].notice || "";
     topicNotice.classList.toggle("visible", Boolean(topicSettings[topic].notice));
