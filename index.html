@@ -7,7 +7,7 @@
     <meta name="description" content="Orakulum - Deine Zahlen. Deine Botschaft.">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="icon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="styles.css?v=5">
+    <link rel="stylesheet" href="styles.css?v=9">
     <title>Orakulum</title>
   </head>
   <body>
@@ -44,8 +44,8 @@
           <button class="topic-card available" data-topic="love">
             <span class="topic-symbol">♡</span><span>Liebe</span><small>Bereit</small>
           </button>
-          <button class="topic-card" disabled>
-            <span class="topic-symbol">◇</span><span>Beruf</span><small>Demnächst</small>
+          <button class="topic-card available" data-topic="career">
+            <span class="topic-symbol">◇</span><span>Beruf</span><small>Bereit</small>
           </button>
           <button class="topic-card" disabled>
             <span class="topic-symbol">◉</span><span>Finanzen</span><small>Demnächst</small>
@@ -53,11 +53,11 @@
           <button class="topic-card" disabled>
             <span class="topic-symbol">⌁</span><span>Psychologie</span><small>Demnächst</small>
           </button>
-          <button class="topic-card" disabled>
-            <span class="topic-symbol">✦</span><span>Gesundheit</span><small>Demnächst</small>
+          <button class="topic-card available" data-topic="health">
+            <span class="topic-symbol">✦</span><span>Gesundheit</span><small>Bereit</small>
           </button>
-          <button class="topic-card" disabled>
-            <span class="topic-symbol">◎</span><span>Geografie</span><small>Demnächst</small>
+          <button class="topic-card available" data-topic="geography">
+            <span class="topic-symbol">◎</span><span>Geografie</span><small>Bereit</small>
           </button>
         </div>
       </section>
@@ -68,6 +68,7 @@
           <p class="section-label" id="activeTopicLabel">Die Engel sprechen</p>
           <h2>Denke jetzt an deine Frage.</h2>
           <p>Gib anschließend intuitiv bis zu 20 Zahlen zwischen 1 und 1000 ein.</p>
+          <p class="topic-notice" id="topicNotice"></p>
 
           <form id="numberForm" novalidate>
             <label for="numberInput">Deine Zahlen</label>
@@ -119,6 +120,6 @@
       <span>Orakulum dient ausschließlich der Unterhaltung. Die Botschaften sind keine Tatsachenvorhersagen und ersetzen keine medizinische, psychologische, rechtliche oder finanzielle Beratung. Entscheidungen triffst du eigenverantwortlich.</span>
     </footer>
 
-    <script src="app.js?v=8" defer></script>
+    <script src="app.js?v=9" defer></script>
   </body>
 </html>

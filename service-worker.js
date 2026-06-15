@@ -1,13 +1,16 @@
-const CACHE_NAME = "orakulum-v8";
+const CACHE_NAME = "orakulum-v9";
 const APP_FILES = [
   "./",
   "index.html",
-  "styles.css?v=5",
-  "app.js?v=8",
+  "styles.css?v=9",
+  "app.js?v=9",
   "manifest.webmanifest",
   "icon.svg",
   "engel-karten-1000.json",
   "liebe-karten-1000.json",
+  "beruf-karten-1000.json",
+  "gesundheit-karten-1000.json",
+  "geografie-karten-1000.json",
 ];
 
 self.addEventListener("install", (event) => {
