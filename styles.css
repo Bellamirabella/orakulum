@@ -401,10 +401,10 @@ form .primary-button {
 
 #resultMessage {
   margin: 0 auto;
-  max-width: 40rem;
+  max-width: 46rem;
   color: var(--wine);
-  font-size: clamp(1.25rem, 4vw, 1.65rem);
-  line-height: 1.65;
+  font-size: clamp(1.08rem, 2vw, 1.35rem);
+  line-height: 1.7;
 }
 
 .result-actions {
