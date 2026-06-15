@@ -48,7 +48,7 @@ const topicSettings = {
   psychology: {
     label: "Psychologie",
     file: "psychologie-karten-1000.json",
-    heading: "Welches psychologische Thema liegt in meinem Energiefeld?",
+    heading: "Welches psychologische Thema liegt in deinem Energieumfeld?",
     notice: "Die psychologischen Fachbegriffe sind ausschließlich symbolische Unterhaltungsimpulse. Sie sind keine Diagnose und ersetzen keine psychologische, psychotherapeutische oder medizinische Beratung.",
   },
 };
