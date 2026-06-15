@@ -108,83 +108,21 @@ function joinNames(names) {
   return `${uniqueNames.slice(0, -1).join(", ")} und ${uniqueNames.at(-1)}`;
 }
 
-function chooseVariant(variants, selectedCards) {
-  const seed = selectedCards.reduce((sum, card) => {
-    const idValue = [...card.id].reduce((value, character) => value + character.charCodeAt(0), 0);
-    return sum + idValue * card.repetitions;
-  }, 0);
-  return variants[seed % variants.length];
-}
-
 function buildInterpretation(selectedCards) {
   const ranked = selectedCards.slice(0, 3);
   const names = joinNames(ranked.map((card) => card.angel || card.title));
   const repeated = ranked.find((card) => card.repetitions > 1);
-  const totalScore = selectedCards.reduce(
-    (sum, card) => sum + card.toneScore * card.repetitions,
-    0,
-  );
-  const averageScore = totalScore / selectedCards.reduce(
-    (sum, card) => sum + card.repetitions,
-    0,
-  );
-
-  let opening;
-  if (averageScore >= 3.5) {
-    opening = chooseVariant([
-      `${names} zeigen eine sehr positive Bewegung.`,
-      `${names} kündigen eine besonders förderliche Entwicklung an.`,
-      `${names} weisen auf starke, unterstützende Kräfte hin.`,
-      `${names} bringen eine ausgesprochen zuversichtliche Botschaft.`,
-      `${names} zeigen, dass sich hier etwas Wertvolles entfalten kann.`,
-    ], selectedCards);
-  } else if (averageScore >= 1.2) {
-    opening = chooseVariant([
-      `${names} weisen auf eine gute Entwicklung hin, die dein bewusstes Handeln braucht.`,
-      `${names} zeigen eine günstige Richtung, die jetzt Aufmerksamkeit verdient.`,
-      `${names} machen Mut, den nächsten Schritt bewusst zu wählen.`,
-      `${names} deuten auf eine positive Möglichkeit hin, die nicht erzwungen werden sollte.`,
-      `${names} zeigen gute Voraussetzungen, wenn du klar und aufmerksam bleibst.`,
-    ], selectedCards);
-  } else if (averageScore <= -3.5) {
-    opening = chooseVariant([
-      `${names} sprechen eine deutliche Warnung aus.`,
-      `${names} zeigen, dass du die aktuelle Richtung ernsthaft prüfen solltest.`,
-      `${names} machen auf ein starkes Warnsignal aufmerksam.`,
-      `${names} raten zu Abstand, Schutz und einer nüchternen Neubewertung.`,
-      `${names} zeigen eine belastende Dynamik, die nicht übergangen werden sollte.`,
-    ], selectedCards);
-  } else if (averageScore <= -1.2) {
-    opening = chooseVariant([
-      `${names} raten dir, die Situation aufmerksam zu prüfen.`,
-      `${names} zeigen Hindernisse, die eine klare Antwort verlangen.`,
-      `${names} mahnen zu Vorsicht und einem ehrlichen Blick auf die Tatsachen.`,
-      `${names} weisen darauf hin, dass etwas noch nicht stimmig ist.`,
-      `${names} empfehlen, Tempo herauszunehmen und Grenzen ernst zu nehmen.`,
-    ], selectedCards);
-  } else {
-    opening = chooseVariant([
-      `${names} zeigen eine gemischte Lage, die noch keine eindeutige Richtung vorgibt.`,
-      `${names} weisen auf widersprüchliche Kräfte hin, die zunächst verstanden werden wollen.`,
-      `${names} zeigen Licht und Schatten zugleich; eine vorschnelle Antwort wäre jetzt wenig hilfreich.`,
-      `${names} machen deutlich, dass noch nicht alle entscheidenden Informationen sichtbar sind.`,
-      `${names} zeigen eine offene Entwicklung, bei der Beobachtung und Ehrlichkeit entscheidend sind.`,
-      `${names} weisen auf verschiedene Möglichkeiten hin, deren Folgen sorgfältig bedacht werden sollten.`,
-      `${names} zeigen, dass Wunsch und Wirklichkeit momentan voneinander getrennt betrachtet werden müssen.`,
-      `${names} bringen eine vielschichtige Botschaft, die eine bewusste Entscheidung verlangt.`,
-    ], selectedCards);
-  }
 
   const coreCards = ranked.slice(0, 2);
   const core = coreCards
     .map((card) => card.core.replace(/[.!?]$/, ""))
-    .join("; zugleich gilt: ");
+    .join(". ");
   const emphasis = repeated
-    ? ` Die wiederkehrende Kraft von ${repeated.angel || repeated.title} verstärkt dabei den Schwerpunkt „${repeated.focus}“.`
+    ? ` ${repeated.angel || repeated.title} erscheint mehrfach und verstärkt: ${repeated.core}`
     : "";
   const guidance = ranked[0].guidance;
 
-  return `${opening} ${core}.${emphasis} ${guidance}`;
+  return `${names}: ${core}.${emphasis} ${guidance}`;
 }
 
 async function loadCards() {
