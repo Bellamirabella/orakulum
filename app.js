@@ -1,0 +1,216 @@
+const screens = {
+  home: document.querySelector("#homeScreen"),
+  question: document.querySelector("#questionScreen"),
+  loading: document.querySelector("#loadingScreen"),
+  result: document.querySelector("#resultScreen"),
+};
+
+const numberForm = document.querySelector("#numberForm");
+const numberInput = document.querySelector("#numberInput");
+const numberCount = document.querySelector("#numberCount");
+const inputError = document.querySelector("#inputError");
+const resultMessage = document.querySelector("#resultMessage");
+const shareStatus = document.querySelector("#shareStatus");
+
+let cards = [];
+let currentDeck = [];
+let currentMessage = "";
+
+function showScreen(name) {
+  Object.entries(screens).forEach(([screenName, element]) => {
+    element.classList.toggle("active", screenName === name);
+  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function shuffle(source) {
+  const result = [...source];
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [result[index], result[randomIndex]] = [result[randomIndex], result[index]];
+  }
+  return result;
+}
+
+function parseNumbers(value) {
+  const tokens = value.trim() ? value.trim().split(/[\s,]+/) : [];
+  return {
+    tokens,
+    numbers: tokens
+      .filter((token) => /^\d+$/.test(token))
+      .map(Number),
+  };
+}
+
+function validateInput(value) {
+  const { tokens, numbers } = parseNumbers(value);
+  if (!tokens.length) {
+    return { error: "Bitte gib mindestens eine Zahl ein.", numbers: [] };
+  }
+  if (tokens.some((token) => !/^\d+$/.test(token))) {
+    return { error: "Bitte verwende nur ganze Zahlen, Kommas und Leerzeichen.", numbers: [] };
+  }
+  if (numbers.length > 20) {
+    return { error: "Du kannst höchstens 20 Zahlen eingeben.", numbers };
+  }
+  if (numbers.some((number) => number < 1 || number > 1000)) {
+    return { error: "Jede Zahl muss zwischen 1 und 1000 liegen.", numbers };
+  }
+  return { error: "", numbers };
+}
+
+function updateNumberCount() {
+  const { numbers } = parseNumbers(numberInput.value);
+  numberCount.textContent = `${Math.min(numbers.length, 99)} / 20`;
+  numberCount.style.color = numbers.length > 20 ? "#9d3445" : "";
+  inputError.textContent = "";
+}
+
+function countSelections(numbers) {
+  return numbers.reduce((counts, number) => {
+    counts.set(number, (counts.get(number) || 0) + 1);
+    return counts;
+  }, new Map());
+}
+
+function pickCards(numbers) {
+  const selectionCounts = countSelections(numbers);
+  return [...selectionCounts.entries()]
+    .map(([number, repetitions]) => ({
+      ...currentDeck[number - 1],
+      repetitions,
+      weightedScore: currentDeck[number - 1].toneScore * repetitions,
+    }))
+    .sort((first, second) => {
+      if (second.repetitions !== first.repetitions) {
+        return second.repetitions - first.repetitions;
+      }
+      return Math.abs(second.weightedScore) - Math.abs(first.weightedScore);
+    });
+}
+
+function joinNames(names) {
+  const uniqueNames = [...new Set(names)];
+  if (uniqueNames.length === 1) return uniqueNames[0];
+  if (uniqueNames.length === 2) return `${uniqueNames[0]} und ${uniqueNames[1]}`;
+  return `${uniqueNames.slice(0, -1).join(", ")} und ${uniqueNames.at(-1)}`;
+}
+
+function buildInterpretation(selectedCards) {
+  const ranked = selectedCards.slice(0, 3);
+  const names = joinNames(ranked.map((card) => card.angel));
+  const repeated = ranked.find((card) => card.repetitions > 1);
+  const totalScore = selectedCards.reduce(
+    (sum, card) => sum + card.toneScore * card.repetitions,
+    0,
+  );
+  const averageScore = totalScore / selectedCards.reduce(
+    (sum, card) => sum + card.repetitions,
+    0,
+  );
+
+  let opening;
+  if (averageScore >= 3.5) {
+    opening = `${names} zeigen eine sehr positive Bewegung.`;
+  } else if (averageScore >= 1.2) {
+    opening = `${names} weisen auf eine gute Entwicklung hin, die dein bewusstes Handeln braucht.`;
+  } else if (averageScore <= -3.5) {
+    opening = `${names} sprechen eine deutliche Warnung aus.`;
+  } else if (averageScore <= -1.2) {
+    opening = `${names} raten dir, die Situation aufmerksam zu prüfen.`;
+  } else {
+    opening = `${names} zeigen eine gemischte Lage, in der Klarheit wichtiger ist als Eile.`;
+  }
+
+  const coreCards = ranked.slice(0, 2);
+  const core = coreCards
+    .map((card) => card.core.replace(/[.!?]$/, ""))
+    .join("; zugleich gilt: ");
+  const emphasis = repeated
+    ? ` Die wiederkehrende Kraft von ${repeated.angel} verstärkt dabei den Schwerpunkt „${repeated.focus}“.`
+    : "";
+  const guidance = ranked[0].guidance;
+
+  return `${opening} ${core}.${emphasis} ${guidance}`;
+}
+
+async function loadCards() {
+  try {
+    const response = await fetch("engel-karten-1000.json");
+    if (!response.ok) throw new Error("Kartendaten nicht verfügbar");
+    const data = await response.json();
+    cards = data.cards;
+    currentDeck = shuffle(cards);
+  } catch {
+    inputError.textContent = "Die Kartendaten konnten nicht geladen werden. Bitte öffne Orakulum über einen Webserver.";
+  }
+}
+
+document.querySelector('[data-topic="angels"]').addEventListener("click", () => {
+  currentDeck = shuffle(cards);
+  showScreen("question");
+  setTimeout(() => numberInput.focus(), 300);
+});
+
+document.querySelectorAll("[data-back]").forEach((button) => {
+  button.addEventListener("click", () => showScreen("home"));
+});
+
+document.querySelector("#homeButton").addEventListener("click", () => showScreen("home"));
+numberInput.addEventListener("input", updateNumberCount);
+
+numberForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const validation = validateInput(numberInput.value);
+  if (validation.error) {
+    inputError.textContent = validation.error;
+    return;
+  }
+  if (currentDeck.length !== 1000) {
+    inputError.textContent = "Die Karten sind noch nicht bereit. Bitte versuche es gleich erneut.";
+    return;
+  }
+
+  currentMessage = buildInterpretation(pickCards(validation.numbers));
+  numberInput.value = "";
+  updateNumberCount();
+  showScreen("loading");
+  window.setTimeout(() => {
+    resultMessage.textContent = currentMessage;
+    showScreen("result");
+  }, 4000);
+});
+
+document.querySelector("#newQuestionButton").addEventListener("click", () => {
+  currentDeck = shuffle(cards);
+  currentMessage = "";
+  resultMessage.textContent = "";
+  shareStatus.textContent = "";
+  showScreen("question");
+  setTimeout(() => numberInput.focus(), 300);
+});
+
+document.querySelector("#shareButton").addEventListener("click", async () => {
+  const shareText = `${currentMessage}\n\nOrakulum`;
+  try {
+    if (navigator.share) {
+      await navigator.share({ text: shareText });
+      shareStatus.textContent = "";
+      return;
+    }
+    await navigator.clipboard.writeText(shareText);
+    shareStatus.textContent = "Die Botschaft wurde kopiert.";
+  } catch (error) {
+    if (error.name !== "AbortError") {
+      shareStatus.textContent = "Die Botschaft konnte nicht geteilt werden.";
+    }
+  }
+});
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js").catch(() => {});
+  });
+}
+
+loadCards();
